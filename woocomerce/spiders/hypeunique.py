@@ -13,9 +13,9 @@ class HypeuniqueSpider(scrapy.Spider):
     custom_settings = {
         "PLAYWRIGHT_LAUNCH_OPTIONS": {
             "proxy": {
-                "server": "http://89.248.68.185:61637",
-                "username": "aVCpGGTJ",
-                "password": "cMJLfnkB"
+                "server": "",
+                "username": "",
+                "password": ""
             }
         }
     }
