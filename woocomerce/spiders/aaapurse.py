@@ -1,24 +1,14 @@
 import uuid
 
 import scrapy
-from scrapy_playwright.page import PageMethod
 
 from woocomerce.items import WoocomerceItem
 
 
-class HypeuniqueSpider(scrapy.Spider):
-    name = 'hypeunique'
-    allowed_domains = ['hypeunique.is']
-    url = 'https://hypeunique.is/new-releases/'
-    custom_settings = {
-        "PLAYWRIGHT_LAUNCH_OPTIONS": {
-            "proxy": {
-                "server": "http://89.248.68.185:61637",
-                "username": "aVCpGGTJ",
-                "password": "cMJLfnkB"
-            }
-        }
-    }
+class AaapurseSpider(scrapy.Spider):
+    name = 'aaapurse'
+    allowed_domains = ['www.aaapurse.nu']
+    url = 'https://www.aaapurse.nu'
 
     def start_requests(self):
         yield scrapy.Request(self.url, meta={"playwright": True}, callback=self.parse, dont_filter=True)
@@ -34,14 +24,7 @@ class HypeuniqueSpider(scrapy.Spider):
             yield scrapy.Request(url, meta={"playwright": True}, callback=self.parse_detail)
         next_page = response.xpath('//a[@class="next page-numbers"]/@href').extract_first('').strip()
         if next_page:
-            yield scrapy.Request(next_page, meta=dict(
-                playwright=True,
-                playwright_include_page=True,
-                playwright_page_methods=[
-                    PageMethod("wait_for_selector", "img.porto-lazyload.alignnone.size-full"),
-                    PageMethod("evaluate", "window.scrollBy(0, document.body.scrollHeight)")
-                ]
-            ), callback=self.parse)
+            yield scrapy.Request(next_page, meta={"playwright": True}, callback=self.parse)
 
     def parse_detail(self, response):
         item = WoocomerceItem()
@@ -56,12 +39,11 @@ class HypeuniqueSpider(scrapy.Spider):
         item['short_description'] = response.xpath(
             'string(//div[@class="description woocommerce-product-details__short-description"])').extract_first(
             '').strip()
-        description = []
-        for e in list(set(response.xpath('//div[@id="tab-description"]//img/@data-oi').extract())):
+        item['description'] = []
+        for e in list(set(response.xpath(
+                '//div[@class="tab-content resp-tab-content resp-tab-content-active"]//p/img/@src').extract())):
             if 'lazy' not in e and 'porto_placeholders' not in e:
-                description.append(e)
-
-        item['description'] = description
+                item['description'].append(e)
         item['date_sale_price_starts'] = ''
         item['date_sale_price_ends'] = ''
         item['tax_status'] = 'taxable'
@@ -89,13 +71,12 @@ class HypeuniqueSpider(scrapy.Spider):
         item['categories'] = ' > '.join(categories)
         item['tags'] = response.xpath('//span[@class="tagged_as"]//a/text()').extract()
         item['shipping_class'] = ''
-        images = []
+        item['images'] = []
         for e in list(
                 set(response.xpath(
                     '//div[@class="owl-stage"]//div[@class="img-thumbnail"]/div[@class="inner"]/img/@src').extract())):
             if 'lazy' not in e and 'porto_placeholders' not in e:
-                images.append(e)
-        item['images'] = images
+                item['images'].append(e)
         item['download_limit'] = ''
         item['download_expiry_days'] = ''
         item['parent'] = 'New Release'
@@ -125,5 +106,5 @@ class HypeuniqueSpider(scrapy.Spider):
         item['download_1_url'] = ''
         item['download_2_name'] = ''
         item['download_2_url'] = ''
-        item['all_image'] = list(set(item['images'] + item['description']))
+        item['all_image'] = item['images'] + item['description']
         return item

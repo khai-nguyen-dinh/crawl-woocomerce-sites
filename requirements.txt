@@ -1,3 +1,5 @@
 scrapy-playwright
 scrapy
 pylint
+requests
+pillow

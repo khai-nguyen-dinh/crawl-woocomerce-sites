@@ -38,9 +38,9 @@ class EveryDesignersSpider(scrapy.Spider):
         item['is_featured'] = 1
         item['visibility_in_catalog'] = "visible"
         item['short_description'] = response.xpath(
-            'string(//div[@class="woocommerce-product-details__short-description"]//ul)').extract_first().strip()
+            'string(//div[@class="woocommerce-product-details__short-description"]//ul)').extract_first('').strip()
         item['description'] = response.xpath(
-            'string(//div[@id="tab-description"]//ul)').extract_first().strip()
+            'string(//div[@id="tab-description"]//ul)').extract_first('').strip()
         item['date_sale_price_starts'] = ''
         item['date_sale_price_ends'] = ''
         item['tax_status'] = 'taxable'
@@ -77,7 +77,8 @@ class EveryDesignersSpider(scrapy.Spider):
         item['allow_customer_reviews'] = 1
 
         item['regular_price'] = response.xpath(
-            '//div[@class="summary entry-summary"]//span[@class="woocommerce-Price-amount amount"]/text()').extract_first()
+            '//div[@class="summary entry-summary"]//span[@class="woocommerce-Price-amount amount"]/text()').extract_first(
+            '')
         item['sale_price'] = ''
         categories = response.xpath('//nav[@class="woocommerce-breadcrumb"]//span/a/text()').extract()
         del categories[0]
@@ -95,9 +96,9 @@ class EveryDesignersSpider(scrapy.Spider):
         item['button_text'] = ''
         item['position'] = 0
         item['attribute_1_name'] = response.xpath(
-            '//th[@class="woocommerce-product-attributes-item__label"]/text()').extract_first()
+            '//th[@class="woocommerce-product-attributes-item__label"]/text()').extract_first('').strip()
         item['attribute_1_value'] = response.xpath(
-            '//td[@class="woocommerce-product-attributes-item__value"]//text()').extract_first()
+            '//td[@class="woocommerce-product-attributes-item__value"]//text()').extract_first('').strip()
         item['attribute_1_visible'] = 1
         item['attribute_1_global'] = 1
         item['attribute_2_name'] = ''
@@ -109,4 +110,5 @@ class EveryDesignersSpider(scrapy.Spider):
         item['download_1_url'] = ''
         item['download_2_name'] = ''
         item['download_2_url'] = ''
+        item['all_image'] = item['images']
         return item

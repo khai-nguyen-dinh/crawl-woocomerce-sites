@@ -58,3 +58,5 @@ class WoocomerceItem(scrapy.Item):
     download_1_url = scrapy.Field()
     download_2_name = scrapy.Field()
     download_2_url = scrapy.Field()
+    downloaded_images = scrapy.Field()
+    all_image = scrapy.Field()
